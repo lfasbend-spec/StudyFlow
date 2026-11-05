@@ -248,6 +248,71 @@ Topics/Notes: ${topics || 'Comprehensive topics'}`,
   }
 });
 
+// AI-Powered Daily Personalized Study Tip & Productivity Quote Generator
+app.post('/api/study-tip', async (req: Request, res: Response) => {
+  try {
+    const { upcomingItems, nextExam, courseNames } = req.body;
+
+    const systemInstruction = `You are an elite, empathetic academic coach and learning scientist (fluent in cognitive psychology, spaced repetition, active recall, and productivity literature like Cal Newport and Barbara Oakley).
+Analyze the student's current workload, nearest exams, and deadlines.
+Generate:
+1. One high-impact, practical study tip tailored SPECIFICALLY to their nearest deadline or exam. Avoid generic advice; give exact, concrete techniques (e.g. self-quizzing, 2-minute starter rule, 25-minute Pomodoro sprint, formula sheet reconstruction, practice exam conditions).
+2. One inspiring, memorable productivity quote with author and brief source that matches their current psychological state (calm, high-pressure, triage, or sustained momentum).
+Keep both short, encouraging, and punchy.`;
+
+    const prompt = `Current Student Academic Snapshot:
+Next Upcoming Exam: ${nextExam ? `${nextExam.title} (${nextExam.courseCode || 'Exam'}) in ${nextExam.daysLeft} days` : 'None scheduled this week'}
+Upcoming Incomplete Deadlines (Next 7-14 Days):
+${upcomingItems && upcomingItems.length > 0
+  ? upcomingItems.map((i: any) => `- [${(i.type || 'TASK').toUpperCase()}] ${i.title} (${i.courseCode || 'Course'}) due in ${i.daysLeft} days (Weight: ${i.weight || 'N/A'})`).join('\n')
+  : 'All current deliverables are completed!'}
+Enrolled Courses: ${courseNames ? courseNames.join(', ') : 'College courses'}
+
+Provide the customized daily study tip and matching productivity quote in JSON format.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: prompt,
+      config: {
+        systemInstruction,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            tip: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING, description: 'Short catchy action headline' },
+                content: { type: Type.STRING, description: '1-2 sentences of actionable tactic directly referencing their situation' },
+                contextTag: { type: Type.STRING, description: 'e.g. "Exam in 2 Days" or "Assignment Sprint"' },
+                suggestedAction: { type: Type.STRING, description: 'Micro-step' }
+              },
+              required: ['title', 'content', 'contextTag']
+            },
+            quote: {
+              type: Type.OBJECT,
+              properties: {
+                content: { type: Type.STRING, description: 'The quote text itself' },
+                author: { type: Type.STRING, description: 'Author of the quote' },
+                source: { type: Type.STRING, description: 'Book, essay, or context' },
+                contextTag: { type: Type.STRING, description: 'Theme' }
+              },
+              required: ['content', 'author', 'contextTag']
+            }
+          },
+          required: ['tip', 'quote']
+        }
+      }
+    });
+
+    const parsed = JSON.parse(response.text || '{}');
+    res.json(parsed);
+  } catch (err: any) {
+    console.error('Error generating daily study tip:', err);
+    res.status(500).json({ error: err?.message || 'Failed to generate daily study tip' });
+  }
+});
+
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');

@@ -22,6 +22,7 @@ interface CalendarViewProps {
   onToggleComplete: (itemId: string) => void;
   onToggleCheckpoint: (itemId: string, checkpointId: string) => void;
   onOpenAddWithDate: (dateStr: string) => void;
+  onStartPomodoro?: (item: AcademicItem) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
@@ -30,6 +31,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   onToggleComplete,
   onToggleCheckpoint,
   onOpenAddWithDate,
+  onStartPomodoro,
 }) => {
   // Start with November 2026 based on context, or current month
   const today = new Date();
@@ -327,11 +329,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           >
                             {item.title}
                           </p>
-                          {item.weight && (
-                            <span className="text-[11px] text-slate-500 dark:text-pink-400/70 block mt-0.5">
-                              Weight: {item.weight}
-                            </span>
-                          )}
+                          <div className="flex items-center justify-between gap-2 mt-1">
+                            {item.weight ? (
+                              <span className="text-[11px] text-slate-500 dark:text-pink-400/70 block">
+                                Weight: {item.weight}
+                              </span>
+                            ) : <span />}
+
+                            {onStartPomodoro && (
+                              <button
+                                onClick={() => onStartPomodoro(item)}
+                                className="px-2 py-0.5 text-[10px] font-semibold text-pink-700 dark:text-pink-300 bg-pink-50 hover:bg-pink-100 dark:bg-pink-950/60 dark:hover:bg-pink-900/60 border border-pink-100 dark:border-pink-900/50 rounded-lg transition-colors flex items-center gap-1 shrink-0"
+                                title="Start focus session for this task"
+                              >
+                                <Clock className="w-3 h-3 text-pink-500" />
+                                <span>Focus</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

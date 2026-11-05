@@ -1,12 +1,13 @@
 import React from 'react';
 import { ViewMode } from '../types';
-import { Sparkles, Calendar, CheckSquare, BookOpen, Sun, Moon, Plus, Award } from 'lucide-react';
+import { Sparkles, Calendar, CheckSquare, BookOpen, Sun, Moon, Plus, Award, Clock } from 'lucide-react';
 
 interface NavbarProps {
   currentView: ViewMode;
   onViewChange: (view: ViewMode) => void;
   onOpenImport: () => void;
   onOpenAdd: () => void;
+  onOpenPomodoro?: () => void;
   isDark: boolean;
   onToggleTheme: () => void;
   totalPendingCount: number;
@@ -19,6 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onViewChange,
   onOpenImport,
   onOpenAdd,
+  onOpenPomodoro,
   isDark,
   onToggleTheme,
   totalPendingCount,
@@ -116,8 +118,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Zone 3: 1 primary action + theme toggle */}
+          {/* Zone 3: 1 primary action + Pomodoro timer + theme toggle */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {onOpenPomodoro && (
+              <button
+                onClick={onOpenPomodoro}
+                aria-label="Open Pomodoro Timer"
+                title="Pomodoro Study Timer"
+                className="px-2.5 py-1.5 text-xs font-semibold text-pink-700 dark:text-pink-300 bg-pink-50/80 hover:bg-pink-100 dark:bg-pink-950/50 dark:hover:bg-pink-900/50 border border-pink-100 dark:border-pink-900/40 rounded-lg transition-colors flex items-center gap-1.5"
+              >
+                <Clock className="w-3.5 h-3.5 text-pink-500" />
+                <span className="hidden md:inline">Focus Timer</span>
+              </button>
+            )}
+
             <button
               onClick={onToggleTheme}
               aria-label="Toggle color theme"

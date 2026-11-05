@@ -15,6 +15,8 @@ import { GradeTrackerView } from './components/GradeTrackerView';
 import { TimelineFilters } from './components/TimelineFilters';
 import { SyllabusImportModal } from './components/SyllabusImportModal';
 import { AddItemModal } from './components/AddItemModal';
+import { PomodoroTimer } from './components/PomodoroTimer';
+import { DailyStudyCoachCard } from './components/DailyStudyCoachCard';
 import { getDaysDifference } from './utils/dateUtils';
 import { calculateSemesterGpa } from './utils/gradeUtils';
 import { CheckSquare, Calendar, Sparkles, Plus, AlertCircle, BookOpen, Award } from 'lucide-react';
@@ -80,11 +82,18 @@ export default function App() {
   });
   const [sortBy, setSortBy] = useState<'date' | 'weight' | 'course'>('date');
 
-  // Modals
+  // Modals & Focus Timer
   const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [editingItem, setEditingItem] = useState<AcademicItem | null>(null);
   const [addModalDefaultDate, setAddModalDefaultDate] = useState<string | undefined>(undefined);
+  const [isPomodoroOpen, setIsPomodoroOpen] = useState<boolean>(false);
+  const [pomodoroItem, setPomodoroItem] = useState<AcademicItem | null>(null);
+
+  const handleStartPomodoro = (item?: AcademicItem) => {
+    setPomodoroItem(item || null);
+    setIsPomodoroOpen(true);
+  };
 
   // Handlers for Items
   const handleToggleComplete = (itemId: string) => {
@@ -341,6 +350,7 @@ export default function App() {
           setAddModalDefaultDate(undefined);
           setIsAddModalOpen(true);
         }}
+        onOpenPomodoro={() => handleStartPomodoro()}
         isDark={isDark}
         onToggleTheme={() => setIsDark(!isDark)}
         totalPendingCount={totalPendingCount}
@@ -365,6 +375,13 @@ export default function App() {
               onOpenImport={() => setIsImportModalOpen(true)}
               onFilterExamsOnly={() => setFilter({ ...filter, selectedType: 'exam' })}
               onNavigateToGrades={() => setCurrentView('grades')}
+            />
+
+            {/* Daily Personalized Study Tip & Productivity Quote Card */}
+            <DailyStudyCoachCard
+              items={items}
+              courses={courses}
+              onStartPomodoro={handleStartPomodoro}
             />
 
             {/* Filter and Search Bar */}
@@ -438,6 +455,7 @@ export default function App() {
                         }}
                         onDeleteItem={handleDeleteItem}
                         onLogGrade={() => setCurrentView('grades')}
+                        onStartPomodoro={handleStartPomodoro}
                       />
                     ))}
                   </div>
@@ -469,6 +487,7 @@ export default function App() {
                         }}
                         onDeleteItem={handleDeleteItem}
                         onLogGrade={() => setCurrentView('grades')}
+                        onStartPomodoro={handleStartPomodoro}
                       />
                     ))}
                   </div>
@@ -500,6 +519,7 @@ export default function App() {
                         }}
                         onDeleteItem={handleDeleteItem}
                         onLogGrade={() => setCurrentView('grades')}
+                        onStartPomodoro={handleStartPomodoro}
                       />
                     ))}
                   </div>
@@ -531,6 +551,7 @@ export default function App() {
                         }}
                         onDeleteItem={handleDeleteItem}
                         onLogGrade={() => setCurrentView('grades')}
+                        onStartPomodoro={handleStartPomodoro}
                       />
                     ))}
                   </div>
@@ -562,6 +583,7 @@ export default function App() {
                         }}
                         onDeleteItem={handleDeleteItem}
                         onLogGrade={() => setCurrentView('grades')}
+                        onStartPomodoro={handleStartPomodoro}
                       />
                     ))}
                   </div>
@@ -579,6 +601,7 @@ export default function App() {
               courses={courses}
               onToggleComplete={handleToggleComplete}
               onToggleCheckpoint={handleToggleCheckpoint}
+              onStartPomodoro={handleStartPomodoro}
               onOpenAddWithDate={(dateStr) => {
                 setEditingItem(null);
                 setAddModalDefaultDate(dateStr);
@@ -633,7 +656,7 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Modals */}
+      {/* Modals & Focus Timer */}
       <SyllabusImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
@@ -650,6 +673,17 @@ export default function App() {
         courses={courses}
         initialItem={editingItem}
         defaultDate={addModalDefaultDate}
+      />
+
+      <PomodoroTimer
+        isOpen={isPomodoroOpen}
+        onClose={() => setIsPomodoroOpen(false)}
+        activeItem={pomodoroItem}
+        items={items}
+        courses={courses}
+        onSelectTask={(it) => setPomodoroItem(it)}
+        onToggleItemComplete={handleToggleComplete}
+        onToggleCheckpoint={handleToggleCheckpoint}
       />
     </div>
   );

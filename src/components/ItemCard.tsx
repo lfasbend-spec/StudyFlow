@@ -33,6 +33,7 @@ interface ItemCardProps {
   onEditItem: (item: AcademicItem) => void;
   onDeleteItem: (itemId: string) => void;
   onLogGrade?: (item: AcademicItem) => void;
+  onStartPomodoro?: (item: AcademicItem) => void;
 }
 
 export const ItemCard: React.FC<ItemCardProps> = ({
@@ -45,6 +46,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
   onEditItem,
   onDeleteItem,
   onLogGrade,
+  onStartPomodoro,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -207,8 +209,19 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           </div>
         </div>
 
-        {/* Right side: Countdown badge & Context Menu */}
+        {/* Right side: Focus button, Countdown badge & Context Menu */}
         <div className="flex items-center gap-2 shrink-0">
+          {onStartPomodoro && (
+            <button
+              onClick={() => onStartPomodoro(item)}
+              className="px-2.5 py-1 text-xs font-semibold text-pink-700 dark:text-pink-300 bg-pink-50/90 hover:bg-pink-100 dark:bg-pink-950/60 dark:hover:bg-pink-900/60 border border-pink-100 dark:border-pink-900/40 rounded-xl transition-all flex items-center gap-1.5 shadow-2xs hover:scale-102"
+              title="Launch Pomodoro Study Session"
+            >
+              <Clock className="w-3.5 h-3.5 text-pink-500" />
+              <span>Focus</span>
+            </button>
+          )}
+
           <span
             className={`text-xs font-mono tabular-nums px-2.5 py-1 rounded-md font-medium ${
               countdown.urgency === 'completed'
@@ -236,7 +249,19 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 mt-1 w-36 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20 text-xs">
+                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-pink-100 dark:border-slate-700 py-1 z-20 text-xs">
+                  {onStartPomodoro && (
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        onStartPomodoro(item);
+                      }}
+                      className="w-full text-left px-3 py-2 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/50 flex items-center gap-2 font-medium"
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Start Focus Timer</span>
+                    </button>
+                  )}
                   {onLogGrade && (
                     <button
                       onClick={() => {

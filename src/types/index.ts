@@ -60,3 +60,34 @@ export interface GradeDataPoint {
   cumulativeGpa: number;
   coursePercentage: number;
 }
+
+export type PomodoroMode = 'focus' | 'shortBreak' | 'longBreak';
+
+export interface PomodoroSession {
+  id: string;
+  itemId?: string;
+  itemTitle?: string;
+  courseCode?: string;
+  mode: PomodoroMode;
+  durationMinutes: number;
+  completedAt: string;
+}
+
+export interface PomodoroStats {
+  totalFocusMinutes: number;
+  completedPomodoros: number;
+  sessions: PomodoroSession[];
+}
+
+export interface DailyStudyTip {
+  id: string;
+  type: 'tip' | 'quote';
+  title?: string;
+  content: string;
+  author?: string;
+  source?: string;
+  contextTag: string;
+  suggestedAction?: string;
+  relatedItemId?: string;
+  isAiGenerated?: boolean;
+}
