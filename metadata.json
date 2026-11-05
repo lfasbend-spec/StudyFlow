@@ -1,0 +1,8 @@
+{
+  "name": "StudyFlow - Assignment & Exam Prep Tracker",
+  "description": "Intelligent academic task and exam manager that automatically extracts course assignments and test dates from syllabi and generates progressive study checkpoints.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
